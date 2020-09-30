@@ -1,0 +1,3 @@
+sklearn
+theano==0.9
+tqdm==4.50
