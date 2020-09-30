@@ -14,8 +14,9 @@ from sklearn.svm import LinearSVC as LSVC
 
 import theano
 import theano.tensor as T
-from theano.sandbox.cuda.dnn import dnn_conv, dnn_pool
-
+#from theano.sandbox.cuda.dnn import dnn_pool, dnn_conv
+from theano.tensor.nnet import conv2d as dnn_conv
+from theano.tensor.signal.pool import pool_2d as dnn_pool
 from lib import activations
 from lib import updates
 from lib import inits
@@ -92,9 +93,9 @@ def model(X,
     h = lrelu(dnn_conv(X, w, subsample=(2, 2), border_mode=(2, 2)))
     h2 = lrelu(batchnorm(dnn_conv(h, w2, subsample=(2, 2), border_mode=(2, 2)), g=g2, b=b2, u=h2_u, s=h2_s))
     h3 = lrelu(batchnorm(dnn_conv(h2, w3, subsample=(2, 2), border_mode=(2, 2)), g=g3, b=b3, u=h3_u, s=h3_s))
-    h = T.flatten(dnn_pool(h, (4, 4), (4, 4), mode='max'), 2)
-    h2 = T.flatten(dnn_pool(h2, (2, 2), (2, 2), mode='max'), 2)
-    h3 = T.flatten(dnn_pool(h3, (1, 1), (1, 1), mode='max'), 2)
+    h = T.flatten(dnn_pool(h, ws=(4, 4), stride=(4, 4), mode='max'), 2)
+    h2 = T.flatten(dnn_pool(h2, ws=(2, 2), stride=(2, 2), mode='max'), 2)
+    h3 = T.flatten(dnn_pool(h3, ws=(1, 1), stride=(1, 1), mode='max'), 2)
     f = T.concatenate([h, h2, h3], axis=1)
     return [f]
 
